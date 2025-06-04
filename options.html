@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Reload Idle Tab - 詳細設定</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Auto Reload Idle Tab</h1>
+            <p class="subtitle">詳細設定</p>
+        </header>
+        
+        <main>
+            <!-- 基本設定 -->
+            <section class="settings-section">
+                <h2>基本設定</h2>
+                <div class="setting-item">
+                    <label class="toggle-container" data-state="OFF">
+                        <input type="checkbox" id="enabledToggle">
+                        <span class="toggle-label">自動リロードを有効にする</span>
+                    </label>
+                </div>
+                
+                <div class="setting-item">
+                    <label for="idleTime">デフォルトのアイドル時間:</label>
+                    <div class="input-group">
+                        <input type="number" id="idleTime" min="1" max="120" value="5">
+                        <span class="unit">分</span>
+                    </div>
+                    <small class="help-text">操作がない状態がこの時間続くとリロードされます</small>
+                </div>
+            </section>
+            
+            <!-- 除外サイト -->
+            <section class="settings-section">
+                <h2>除外サイト</h2>
+                <p class="section-description">以下のパターンにマッチするサイトは自動リロードの対象外になります</p>
+                
+                <div class="excluded-sites">
+                    <div class="input-row">
+                        <input type="text" id="excludedSiteInput" placeholder="例: *.example.com, https://secure.site/*">
+                        <button id="addExcludedSite" class="btn btn-primary">追加</button>
+                    </div>
+                    <div class="help-text">
+                        <small>ワイルドカード（*）を使用できます。例：*.google.com、https://*/admin/*</small>
+                    </div>
+                    <ul id="excludedSitesList" class="sites-list"></ul>
+                </div>
+            </section>
+            
+            <!-- サイト別設定 -->
+            <section class="settings-section">
+                <h2>サイト別設定</h2>
+                <p class="section-description">特定のサイトに異なるアイドル時間を設定できます</p>
+                
+                <div class="site-specific-settings">
+                    <div class="input-row">
+                        <input type="text" id="sitePatternInput" placeholder="サイトパターン（例：*.example.com）">
+                        <input type="number" id="siteIdleTimeInput" placeholder="時間" min="1" max="120">
+                        <span class="unit">分</span>
+                        <button id="addSiteSpecific" class="btn btn-primary">追加</button>
+                    </div>
+                    <div class="help-text">
+                        <small>より具体的なパターンが優先されます</small>
+                    </div>
+                    <div id="siteSpecificList" class="site-specific-list"></div>
+                </div>
+            </section>
+            
+            <!-- 高度な設定 -->
+            <section class="settings-section">
+                <h2>高度な設定</h2>
+                
+                <div class="setting-item">
+                    <label class="toggle-container" data-state="OFF">
+                        <input type="checkbox" id="debugMode">
+                        <span class="toggle-label">デバッグモードを有効にする</span>
+                    </label>
+                    <small class="help-text">コンソールに詳細なログを出力します</small>
+                </div>
+            </section>
+            
+            <!-- データ管理 -->
+            <section class="settings-section">
+                <h2>データ管理</h2>
+                
+                <div class="button-group">
+                    <button id="exportSettings" class="btn btn-secondary">設定をエクスポート</button>
+                    <button id="importSettings" class="btn btn-secondary">設定をインポート</button>
+                    <button id="resetSettings" class="btn btn-danger">設定をリセット</button>
+                </div>
+                
+                <input type="file" id="importFile" accept=".json" style="display: none;">
+            </section>
+        </main>
+        
+        <!-- 保存状態の表示 -->
+        <div id="saveStatus" class="save-status" style="display: none;">
+            <span id="saveStatusText">設定を保存しました</span>
+        </div>
+    </div>
+    
+    <!-- 確認ダイアログ -->
+    <div id="confirmDialog" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h3 id="confirmTitle">確認</h3>
+            <p id="confirmMessage">この操作を実行しますか？</p>
+            <div class="modal-buttons">
+                <button id="confirmOk" class="btn btn-primary">OK</button>
+                <button id="confirmCancel" class="btn btn-secondary">キャンセル</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="options.js"></script>
+</body>
+</html> 

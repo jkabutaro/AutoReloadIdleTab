@@ -1,0 +1,110 @@
+{
+    "rules": [
+        {
+            "name": "常に全力モード",
+            "description": "ultrathink",
+            "settings": {
+                "turboMode": true,
+                "extremeMode": true,
+                "maxConcurrentRequests": 10,
+                "minUpdateInterval": 0.001,
+                "memoryLimit": 1024,
+                "recoveryStrategy": "aggressive",
+                "fallbackStrategy": "immediate"
+            }
+        },
+        {
+            "name": "ドキュメント管理",
+            "description": "README.mdとDEVELOPMENT.mdの用途を明確に区別",
+            "settings": {
+                "README.md": {
+                    "purpose": "エンドユーザー向けドキュメント",
+                    "target": "アドインの一般ユーザー",
+                    "content": [
+                        "機能の概要説明",
+                        "基本的な使い方と例",
+                        "トラブルシューティング（ユーザー向け）",
+                        "サポート情報"
+                    ],
+                    "restrictions": [
+                        "開発環境の詳細な説明",
+                        "ビルド手順",
+                        "技術的な実装詳細",
+                        "コードの説明"
+                    ]
+                },
+                "DEVELOPMENT.md": {
+                    "purpose": "開発者向けドキュメント",
+                    "target": "アドインの開発者、コントリビューター",
+                    "content": [
+                        "開発環境の詳細",
+                        "ビルド手順",
+                        "プロジェクト構造",
+                        "技術的な注意点",
+                        "開発ガイドライン",
+                        "トラブルシューティング（開発者向け）"
+                    ],
+                    "restrictions": [
+                        "ユーザー向けの機能説明",
+                        "基本的な使い方の説明",
+                        "エンドユーザー向けのトラブルシューティング"
+                    ]
+                },
+                "updateRules": [
+                    "機能追加時は両方のドキュメントを更新",
+                    "ユーザー向けの変更はREADME.mdのみ更新",
+                    "開発環境や技術的な変更はDEVELOPMENT.mdのみ更新",
+                    "更新時は必ず対象読者を意識して内容を選択"
+                ]
+            }
+        },
+        {
+            "name": "作業ログ管理",
+            "description": "cursorでの作業内容をWORK.mdに常時追記し、コミット時に内容を削除する",
+            "settings": {
+                "WORK.md": {
+                    "purpose": "作業ログの一時記録",
+                    "rules": [
+                        "cursorで行った作業内容・変更点・検討事項などを逐次追記する",
+                        "コミット時にはWORK.mdの内容を全て削除する（空にする）",
+                        "コミットメッセージやPR作成時の参考情報として活用する"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "バッチファイル管理",
+            "description": "batファイルは必ずShift_JIS（CP932）で保存・管理する",
+            "settings": {
+                "batファイル": {
+                    "encoding": "Shift_JIS（CP932）",
+                    "rules": [
+                        "batファイル（バッチファイル）は必ずShift_JIS（CP932）で保存・管理する",
+                        "エディタで保存時にエンコーディングを明示的に指定すること",
+                        "文字化け防止のためUTF-8や他のエンコーディングは使用しない"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "ビルド実行管理",
+            "description": "実装完了後は必ずビルドを実行してエラー確認する",
+            "settings": {
+                "ビルド実行": {
+                    "必須実行": "実装が終わったら可能な限りビルドまで行い、ビルドエラーがでないかまで確認する",
+                    "ビルドスクリプト": "dotnet restore ExcelOpenAI.csproj --runtime win-x64 && dotnet clean ExcelOpenAI.csproj --configuration Release --runtime win-x64 && dotnet build ExcelOpenAI.csproj --configuration Release --runtime win-x64 --verbosity normal",
+                    "Excel終了待機": "Excelが起動していたら、Excelが終了するまで待つ",
+                    "rules": [
+                        "コード変更・実装完了後は必ず以下のコマンドでビルドを実行する:",
+                        "1. dotnet restore ExcelOpenAI.csproj --runtime win-x64",
+                        "2. dotnet clean ExcelOpenAI.csproj --configuration Release --runtime win-x64", 
+                        "3. dotnet build ExcelOpenAI.csproj --configuration Release --runtime win-x64 --verbosity normal",
+                        "ビルドエラーが発生した場合は修正してから完了とする",
+                        "Excel.exeプロセスが動作中の場合は終了を促し、終了後にビルドを実行する",
+                        "ビルド成功まで実装作業は完了とみなさない"
+                    ]
+                }
+            }
+        }
+    ]
+} 

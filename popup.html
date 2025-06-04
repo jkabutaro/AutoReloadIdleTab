@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Reload Idle Tab</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Auto Reload Idle Tab</h1>
+        </header>
+        
+        <main>
+            <!-- 機能のON/OFF切り替え -->
+            <div class="setting-item">
+                <label class="toggle-container">
+                    <input type="checkbox" id="enabledToggle">
+                    <span class="toggle-label">自動リロードを有効にする</span>
+                </label>
+            </div>
+            
+            <!-- アイドル時間設定 -->
+            <div class="setting-item">
+                <label for="idleTime">アイドル時間:</label>
+                <div class="input-group">
+                    <input type="number" id="idleTime" min="1" max="60" value="5">
+                    <span class="unit">分</span>
+                </div>
+            </div>
+            
+            <!-- 現在のタブ情報 -->
+            <div class="status-section">
+                <h3>現在のタブ</h3>
+                <div class="tab-info">
+                    <div class="tab-url" id="currentTabUrl">読み込み中...</div>
+                    <div class="tab-status" id="currentTabStatus">
+                        <span class="status-indicator" id="statusIndicator"></span>
+                        <span id="statusText">確認中...</span>
+                    </div>
+                    <div class="next-reload" id="nextReload" style="display: none;">
+                        次のリロード: <span id="reloadTime"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 操作ボタン -->
+            <div class="button-group">
+                <button id="manualReload" class="btn btn-primary">今すぐリロード</button>
+                <button id="resetTimer" class="btn btn-secondary">タイマーリセット</button>
+            </div>
+            
+            <!-- 詳細設定へのリンク -->
+            <div class="footer">
+                <a href="#" id="openOptions" class="options-link">詳細設定を開く</a>
+            </div>
+        </main>
+    </div>
+    
+    <!-- メッセージ表示用 -->
+    <div id="message" class="message" style="display: none;"></div>
+    
+    <script src="popup.js"></script>
+</body>
+</html> 

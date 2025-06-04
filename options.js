@@ -86,24 +86,36 @@ function updateExcludedSitesList() {
   }
   
   if (currentSettings.excludedSites.length === 0) {
-    excludedSitesList.innerHTML = '<li style="text-align: center; color: #666; font-style: italic;">除外サイトはありません</li>';
+    const li = document.createElement('li');
+    li.style.textAlign = 'center';
+    li.style.color = '#666';
+    li.style.fontStyle = 'italic';
+    li.textContent = '除外サイトはありません';
+    excludedSitesList.appendChild(li);
     return;
   }
   
   currentSettings.excludedSites.forEach((pattern, index) => {
     const li = document.createElement('li');
-    li.innerHTML = `
-      <span class="site-pattern">${pattern}</span>
-      <button class="remove-btn" data-index="${index}">削除</button>
-    `;
-    
-    li.querySelector('.remove-btn').addEventListener('click', async () => {
+
+    const span = document.createElement('span');
+    span.className = 'site-pattern';
+    span.textContent = pattern;
+
+    const button = document.createElement('button');
+    button.className = 'remove-btn';
+    button.dataset.index = index;
+    button.textContent = '削除';
+
+    button.addEventListener('click', async () => {
       currentSettings.excludedSites.splice(index, 1);
       await saveSettings(currentSettings);
       updateExcludedSitesList();
       showSaveStatus('除外サイトを削除しました');
     });
-    
+
+    li.appendChild(span);
+    li.appendChild(button);
     excludedSitesList.appendChild(li);
   });
 }
@@ -118,29 +130,49 @@ function updateSiteSpecificList() {
   }
   
   if (Object.keys(currentSettings.siteSpecificSettings).length === 0) {
-    siteSpecificList.innerHTML = '<div style="text-align: center; color: #666; font-style: italic; padding: 20px;">サイト別設定はありません</div>';
+    const div = document.createElement('div');
+    div.style.textAlign = 'center';
+    div.style.color = '#666';
+    div.style.fontStyle = 'italic';
+    div.style.padding = '20px';
+    div.textContent = 'サイト別設定はありません';
+    siteSpecificList.appendChild(div);
     return;
   }
   
   Object.entries(currentSettings.siteSpecificSettings).forEach(([pattern, time]) => {
-    const div = document.createElement('div');
-    div.className = 'site-specific-item';
-    div.innerHTML = `
-      <div class="site-specific-info">
-        <span class="site-pattern">${pattern}</span>
-        <span class="site-time">${time}分</span>
-      </div>
-      <button class="remove-btn" data-pattern="${pattern}">削除</button>
-    `;
-    
-    div.querySelector('.remove-btn').addEventListener('click', async () => {
+    const item = document.createElement('div');
+    item.className = 'site-specific-item';
+
+    const info = document.createElement('div');
+    info.className = 'site-specific-info';
+
+    const spanPattern = document.createElement('span');
+    spanPattern.className = 'site-pattern';
+    spanPattern.textContent = pattern;
+
+    const spanTime = document.createElement('span');
+    spanTime.className = 'site-time';
+    spanTime.textContent = `${time}分`;
+
+    info.appendChild(spanPattern);
+    info.appendChild(spanTime);
+
+    const button = document.createElement('button');
+    button.className = 'remove-btn';
+    button.dataset.pattern = pattern;
+    button.textContent = '削除';
+
+    button.addEventListener('click', async () => {
       delete currentSettings.siteSpecificSettings[pattern];
       await saveSettings(currentSettings);
       updateSiteSpecificList();
       showSaveStatus('サイト別設定を削除しました');
     });
-    
-    siteSpecificList.appendChild(div);
+
+    item.appendChild(info);
+    item.appendChild(button);
+    siteSpecificList.appendChild(item);
   });
 }
 

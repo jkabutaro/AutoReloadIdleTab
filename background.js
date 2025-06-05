@@ -202,7 +202,10 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
 
 // タブの変更を監視
 chrome.tabs.onActivated.addListener(({ tabId }) => {
-  resetTabIdleTime(tabId);
+  // 既にタイマーが存在する場合はリセットしない
+  if (!tabIdleData.has(tabId)) {
+    resetTabIdleTime(tabId);
+  }
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {

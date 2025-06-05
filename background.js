@@ -149,6 +149,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.type === 'saveSettings') {
     saveSettings(message.settings).then(() => sendResponse({ success: true }));
     return true;
+  } else if (message.type === 'getRemainingTime') {
+    (async () => {
+      try {
+        const [settings, tab] = await Promise.all([
+          loadSettings(),
+          chrome.tabs.get(message.tabId)
+        ]);
+        const idleTime = getSiteSpecificIdleTime(tab.url, settings);
+        if (tabIdleData.has(message.tabId)) {
+          const { lastActivity } = tabIdleData.get(message.tabId);
+          const elapsed = Date.now() - lastActivity;
+          const remaining = idleTime * 60 * 1000 - elapsed;
+          sendResponse({ remainingTime: remaining });
+        } else {
+          sendResponse({ remainingTime: null });
+        }
+      } catch (error) {
+        sendResponse({ remainingTime: null });
+      }
+    })();
+    return true;
   }
 });
 

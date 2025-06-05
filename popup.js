@@ -10,6 +10,7 @@ const manualReloadBtn = document.getElementById('manualReload');
 const resetTimerBtn = document.getElementById('resetTimer');
 const openOptionsBtn = document.getElementById('openOptions');
 const messageDiv = document.getElementById('message');
+let countdownInterval = null;
 
 // 設定を読み込む
 async function loadSettings() {
@@ -29,6 +30,32 @@ async function saveSettings(settings) {
 async function getCurrentTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
+}
+
+// 残り時間を取得
+async function getRemainingTime(tabId) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ type: 'getRemainingTime', tabId }, (res) => {
+      if (res && typeof res.remainingTime === 'number') {
+        resolve(res.remainingTime);
+      } else {
+        resolve(null);
+      }
+    });
+  });
+}
+
+// ミリ秒を「X分YY秒」形式にフォーマット
+function formatRemainingTime(ms) {
+  if (ms === null) return '不明';
+  if (ms <= 0) return 'まもなく';
+  const totalSec = Math.ceil(ms / 1000);
+  const minutes = Math.floor(totalSec / 60);
+  const seconds = totalSec % 60;
+  if (minutes > 0) {
+    return `あと${minutes}分${String(seconds).padStart(2, '0')}秒`;
+  }
+  return `あと${seconds}秒`;
 }
 
 // メッセージを表示する
@@ -65,22 +92,31 @@ async function updateTabStatus() {
       statusIndicator.className = 'status-indicator disabled';
       statusText.textContent = '無効';
       nextReload.style.display = 'none';
+      if (countdownInterval) clearInterval(countdownInterval);
     } else if (isSystemPage) {
       statusIndicator.className = 'status-indicator excluded';
       statusText.textContent = 'システムページ（対象外）';
       nextReload.style.display = 'none';
+      if (countdownInterval) clearInterval(countdownInterval);
     } else if (isExcluded) {
       statusIndicator.className = 'status-indicator excluded';
       statusText.textContent = '除外サイト';
       nextReload.style.display = 'none';
+      if (countdownInterval) clearInterval(countdownInterval);
     } else {
       statusIndicator.className = 'status-indicator active';
       statusText.textContent = 'アクティブ';
-      
-      // 次のリロード時間を表示（簡易版）
-      const idleTime = getSiteSpecificIdleTime(tab.url, settings);
+
       nextReload.style.display = 'block';
-      reloadTime.textContent = `約${idleTime}分後`;
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+      }
+      const updateCountdown = async () => {
+        const remaining = await getRemainingTime(tab.id);
+        reloadTime.textContent = formatRemainingTime(remaining);
+      };
+      await updateCountdown();
+      countdownInterval = setInterval(updateCountdown, 1000);
     }
     
   } catch (error) {
@@ -196,4 +232,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 // 初期化
-document.addEventListener('DOMContentLoaded', initializeUI); 
+document.addEventListener('DOMContentLoaded', initializeUI);
+window.addEventListener('unload', () => {
+  if (countdownInterval) clearInterval(countdownInterval);
+});

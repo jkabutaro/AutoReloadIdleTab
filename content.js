@@ -43,15 +43,7 @@ activityEvents.forEach(eventType => {
   });
 });
 
-// ページの可視状態変更を監視
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
-    reportActivity();
-  }
-});
-
-// フォーカス状態の変更を監視
-window.addEventListener('focus', reportActivity);
+// フォーカスやタブの可視状態の変化ではタイマーをリセットしない
 
 // ページロード完了時にアクティビティを報告
 if (document.readyState === 'loading') {

@@ -173,6 +173,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+// 設定変更を監視
+chrome.storage.onChanged.addListener(async (changes, areaName) => {
+  if (areaName !== 'sync' || !changes.enabled) {
+    return;
+  }
+
+  const { oldValue, newValue } = changes.enabled;
+
+  if (newValue === false) {
+    // すべてのタイマーを停止
+    for (const data of tabIdleData.values()) {
+      if (data.timer) {
+        clearTimeout(data.timer);
+        data.timer = null;
+      }
+    }
+  } else if (newValue === true && oldValue === false) {
+    // 有効化されたら既存タブのタイマーを再開
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach(tab => {
+      if (tab.id) {
+        resetTabIdleTime(tab.id);
+      }
+    });
+  }
+});
+
 // タブの変更を監視
 chrome.tabs.onActivated.addListener(({ tabId }) => {
   resetTabIdleTime(tabId);

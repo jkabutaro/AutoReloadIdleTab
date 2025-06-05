@@ -25,7 +25,8 @@ function reportActivity() {
 // 各種ユーザーアクティビティを監視
 const activityEvents = [
   'mousedown',
-  'mousemove',
+  'keyup',
+  'input',
   'keydown',
   'scroll',
   'touchstart',

@@ -215,8 +215,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {})
   "permissions": [
     "activeTab",      // 現在のタブ情報取得
     "tabs",          // タブ操作とイベント監視
-    "storage",       // 設定の永続化
-    "idle"           // システムアイドル検出（将来の拡張用）
+    "storage"        // 設定の永続化
   ]
 }
 ```

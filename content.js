@@ -59,4 +59,35 @@ if (document.readyState === 'loading') {
   reportActivity();
 }
 
-console.log('Auto Reload Idle Tab: コンテンツスクリプトが読み込まれました'); 
+console.log('Auto Reload Idle Tab: コンテンツスクリプトが読み込まれました');
+
+// 楽天証券サイトで自動ログアウトがONなら自動でOFFにする
+(function autoDisableRakutenAutoLogout() {
+  if (location.hostname !== 'member.rakuten-sec.co.jp') return;
+
+  const disable = () => {
+    const checkbox = document.getElementById('changeAutoLogout');
+    if (checkbox && checkbox.checked) {
+      checkbox.click();
+      console.log('Auto Reload Idle Tab: 自動ログアウトをOFFにしました');
+      return true;
+    }
+    return Boolean(checkbox);
+  };
+
+  const run = () => {
+    if (!disable()) {
+      const observer = new MutationObserver(() => {
+        if (disable()) observer.disconnect();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      setTimeout(() => observer.disconnect(), 10000);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();

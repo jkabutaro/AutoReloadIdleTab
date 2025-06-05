@@ -133,6 +133,93 @@ graph TD
    UI操作 → Popup/Options → Background Script → Chrome Storage API
    ```
 
+## 🔧 最近の重要な修正
+
+### Extension Context Invalidated エラー対応
+
+**問題**: Chrome拡張機能のリロード時に発生する「Extension context invalidated」エラー
+
+**解決策**:
+```javascript
+// エラーハンドリングの追加
+chrome.runtime.sendMessage({ type: 'userActivity' }, (response) => {
+  if (chrome.runtime.lastError) {
+    if (chrome.runtime.lastError.message.includes('Extension context invalidated')) {
+      // イベントリスナーを削除してスクリプトを無効化
+      activityEvents.forEach(eventType => {
+        document.removeEventListener(eventType, reportActivity, { 
+          passive: true, 
+          capture: true 
+        });
+      });
+      return;
+    }
+  }
+});
+
+// コンテキスト有効性チェック関数
+function isExtensionContextValid() {
+  try {
+    return chrome.runtime && chrome.runtime.id;
+  } catch (error) {
+    return false;
+  }
+}
+```
+
+### 楽天証券自動ログアウト制御の強化
+
+**問題**: チェックボックスのクリックだけでは楽天証券の自動ログアウト機能が完全にOFFにならない
+
+**解決策**: 包括的な制御アプローチ
+```javascript
+const disableAutoLogout = () => {
+  try {
+    if (typeof $ !== 'undefined' && typeof $.cookie === 'function') {
+      // 1. グローバル変数の設定
+      if (typeof window.autoLogoutUsed !== 'undefined') {
+        window.autoLogoutUsed = true;
+      }
+      
+      // 2. Cookieで状態を保存
+      if (typeof window.autoLogoutStsCookieKey !== 'undefined') {
+        $.cookie(window.autoLogoutStsCookieKey, "0");
+      }
+      
+      // 3. 自動ログアウト設定をfalseに
+      if (typeof window.autoLogout !== 'undefined') {
+        window.autoLogout = false;
+      }
+      
+      // 4. UIの更新
+      $('#changeAutoLogout').prop("checked", false);
+      $("a[id^='changeAutoLogout']").attr("id", "member-top-btn-automatic-logout");
+      
+      // 5. タイマーのリセット
+      if (typeof window.reloadtime !== 'undefined') {
+        window.reloadtime = +new Date(0);
+      }
+      
+      // 6. タイマーループの再開
+      if (typeof window.refreshTimerLoop === 'function') {
+        window.refreshTimerLoop();
+      }
+      
+      return true;
+    }
+  } catch (error) {
+    console.error('楽天証券自動ログアウト設定エラー:', error);
+  }
+  return false;
+};
+```
+
+**改善点**:
+- jQueryの利用可能性チェック
+- 複数のグローバル変数とCookieの同期制御
+- フォールバック機能の実装
+- エラーハンドリングの強化
+
 ## 💾 データ構造
 
 ### 設定オブジェクト（Storage）
